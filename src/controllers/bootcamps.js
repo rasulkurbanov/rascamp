@@ -1,4 +1,5 @@
 const Bootcamp = require('../models/Bootcamp')
+const ErrorResponse = require('../utils/errorResponse')
 
 //@desc GET all bootcamps
 //@route GET /api/v1/bootcamps
@@ -13,9 +14,7 @@ exports.getBootcamps = async (req, res, next) => {
 
   }
   catch(err) {
-    res
-      .status(400)
-      .json({success: false, msg: err.message})
+    next(err)
   }
 }
 
@@ -25,10 +24,9 @@ exports.getBootcamps = async (req, res, next) => {
 exports.getBootcamp = async (req, res, next) => {
   try{
     const bootcamp = await Bootcamp.findById(req.params.id)
+
     if(!bootcamp) {
-      res
-      .status(400)
-      .json({success: false})  
+      return next(new ErrorResponse(`Bootcamp within this id ${req.params.id} not found`, 404))
     }
     else {
       res
@@ -37,9 +35,10 @@ exports.getBootcamp = async (req, res, next) => {
     }
   }
   catch(err) {
-    res
-      .status(400)
-      .json({success: false, msg: err.message})
+    // res
+    //   .status(400)
+    //   .json({success: false, msg: err.message})
+    next(err)
   }
 }
 
@@ -55,8 +54,7 @@ exports.createBootcamp = async (req, res, next) => {
       .json({success: true, data: bootcamp})
   }
   catch(err) {
-    console.log(err)
-    res.status(400).json({success: false, msg: err.message})
+    next(err)
   }
 }
 
@@ -72,9 +70,7 @@ exports.updateBootcamp = async (req, res, next) => {
     res.status(200).json({success: true, data: bootcamp})
   }
   catch(err) {
-    res 
-      .status(400)
-      .json({success: true, data: bootcamp})
+    next(err)
   }
 
 }
@@ -92,9 +88,7 @@ exports.deleteBootcamp = async (req, res, next) => {
 
   }
   catch(err) {
-    res
-      .status(400)
-      .json({success: false, msg: err.message})
+    next(err)
   }
 } 
 

@@ -6,6 +6,7 @@ dotenv.config({ path: './config/config.env' })
 const PORT = process.env.PORT || 5000
 const bootcamps = require('./routes/bootcamps')
 const connectDB = require('./config/db')
+const errorHandler = require('./middlewares/error')
 
 
 const app = express()
@@ -17,15 +18,14 @@ if(process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
+connectDB()
+
 //Mount using middleware
 app.use('/api/v1/bootcamps', bootcamps)
 
+app.use(errorHandler)
 
 
-
-
-
-connectDB()
 
 app.listen(PORT, () => console.log(`Server running on ${process.env.NODE_ENV} mode and on PORT: ${PORT}`))
 

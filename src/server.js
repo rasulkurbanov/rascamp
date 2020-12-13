@@ -5,6 +5,7 @@ const morgan = require('morgan')
 dotenv.config({ path: './config/config.env' })
 const PORT = process.env.PORT || 5000
 const bootcamps = require('./routes/bootcamps')
+const courses = require('./routes/courses')
 const connectDB = require('./config/db')
 const errorHandler = require('./middlewares/error')
 
@@ -22,6 +23,7 @@ connectDB()
 
 //Mount using middleware
 app.use('/api/v1/bootcamps', bootcamps)
+app.use('/api/v1/courses', courses)
 
 app.use(errorHandler)
 

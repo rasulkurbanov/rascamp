@@ -8,7 +8,9 @@
     "express": "^4.17.1",
     "mongoose": "^5.11.6",
     "morgan": "^1.10.0",
+    "node-geocoder": "^3.27.0",
     "nodemon": "^2.0.6",
+    "path": "^0.12.7",
     "slugify": "^1.4.6"
   },
   "devDependencies": {},

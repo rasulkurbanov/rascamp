@@ -99,6 +99,9 @@ const BootcampSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 })
 
 
@@ -127,6 +130,29 @@ BootcampSchema.pre('save', async function(next) {
   this.address = undefined
   next()
 })
+
+//Cascade deleting
+BootcampSchema.pre('remove', async function(next) {
+  console.log(`Courses removed referenced to ${this._id} bootcamp`)
+
+  await this.model('Course').deleteMany({bootcamp: this._id})
+  next()
+})
+
+
+
+
+//Populating with virtuals
+BootcampSchema.virtual('courses', {
+  ref: 'Course',
+  localField: '_id',
+  foreignField: 'bootcamp',
+  justOne: false
+})
+
+
+
+
 
 let Bootcamp = mongoose.model('Bootcamp', BootcampSchema)
 

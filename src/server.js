@@ -1,6 +1,8 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
+const fileUpload = require('express-fileupload')
+const path = require('path')
 //Loading env variables
 dotenv.config({ path: './config/config.env' })
 const PORT = process.env.PORT || 5000
@@ -19,6 +21,11 @@ if(process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
+//File Upload middleware
+app.use(fileUpload())
+
+app.use(express.static(path.join(__dirname, 'public')))
+
 connectDB()
 
 //Mount using middleware
@@ -26,6 +33,7 @@ app.use('/api/v1/bootcamps', bootcamps)
 app.use('/api/v1/courses', courses)
 
 app.use(errorHandler)
+
 
 
 

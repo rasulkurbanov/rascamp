@@ -22,7 +22,7 @@ let courses = JSON.parse(fs.readFileSync(path.join(__dirname, '/_data/courses.js
 async function importData() {
   try {
     await Bootcamp.create(bootcamps)
-    // await Course.create(courses)
+    await Course.create(courses)
     console.log(`Data successfully created`)
 
     process.exit()

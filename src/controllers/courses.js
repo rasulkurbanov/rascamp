@@ -23,8 +23,6 @@ exports.getCourses = asyncHandler( async(req, res, next) => {
     res.status(200).json(res.advancedResults)
   }
 })
-
-
 //@desc Get a single course via id
 //@route GET /api/v1/courses/:id 
 //Access Public

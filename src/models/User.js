@@ -45,11 +45,14 @@ UserSchema.pre('save', async function(next) {
 })
 
 UserSchema.methods.getSignedJwtToken = function() {
-  return jwt.sign({id: this._id}, process.env.JWT_SECRET_KEY, {
+  return jwt.sign({id: this._id, name: this.name}, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN
   })
 }
 
+UserSchema.methods.checkPassword = async function(password) {
+  return await bcrypt.compare(password, this.password)
+}
 
 
 

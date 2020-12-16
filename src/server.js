@@ -14,7 +14,6 @@ const auth = require('./routes/auth')
 
 const connectDB = require('./config/db')
 const errorHandler = require('./middlewares/error')
-const { register } = require('./controllers/auth')
 
 
 const app = express()
@@ -36,7 +35,7 @@ connectDB()
 //Mount using middleware
 app.use('/api/v1/bootcamps', bootcamps)
 app.use('/api/v1/courses', courses)
-app.use('/api/v1/auth', register)
+app.use('/api/v1/auth', auth)
 
 app.use(errorHandler)
 

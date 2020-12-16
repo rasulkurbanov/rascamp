@@ -16,9 +16,8 @@ exports.register = asyncHandler(async(req, res, next) => {
     role
   })
 
-  const token = user.getSignedJwtToken()
+  sendTokenResponse(user, 200, res)
 
-  res.status(201).json({success: true, data: user, token})
 })
 
 
@@ -47,8 +46,25 @@ exports.login = asyncHandler(async(req, res, next) => {
     return next(new ErrorResponse(`Incorrect password or email`, 401))
   }
 
+  sendTokenResponse(user, 200, res)
+})
+
+
+//Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  
+
   //Creating token
   const token = user.getSignedJwtToken()
 
-  res.status(201).json({success: true, token})
-})
+  const options = {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true
+  }
+
+  res
+    .status(statusCode)
+    .cookie('token', token, options)
+    .json({success: true, token})
+
+}

@@ -92,6 +92,13 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`)
     )
   }
+
+  if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`This id ${req.user.id} is not an owner of bootcamp, thus can not delete`, 400))
+  }
+
+
   bootcamp.remove()
   res
     .status(200)

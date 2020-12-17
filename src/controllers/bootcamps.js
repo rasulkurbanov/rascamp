@@ -37,7 +37,6 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/bootcamps
 //access PUBLIC
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
-  console.log(req.user)
   //Add user to req.body
   req.body.user = req.user.id
 
@@ -60,10 +59,25 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 //@route PUT /api/v1/bootcamps/:id
 //access PUBLIC
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-  let bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+
+  let bootcamp = await Bootcamp.findById(req.params.id)
+
+  if(!bootcamp) {
+    return next(
+      new ErrorResponse(`Bootcamp not found with this id ${req.params.id}`, 400)
+    )
+  } 
+
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`This id ${req.user.id} is not an owner of bootcamp, thus can not update`, 400))
+  }
+
+  bootcamp = await Bootcamp.findOneAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
   })
+
   res.status(200).json({ success: true, data: bootcamp })
 })
 

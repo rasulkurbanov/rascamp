@@ -31,7 +31,7 @@ const BootcampSchema = new mongoose.Schema({
   email: {
     type: String,
     match: [
-      /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/, 
+      /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/,
       "Please add a valid email"
     ]
   },
@@ -98,22 +98,28 @@ const BootcampSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: true
   }
-}, {
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-})
+},
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  })
 
 
 
 
-BootcampSchema.pre('save', function(next) {
-  this.slug = slugify(this.name, {lower: true})
+BootcampSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true })
   next()
 })
 
 
-BootcampSchema.pre('save', async function(next) {
+BootcampSchema.pre('save', async function (next) {
   const loc = await geocoder.geocode(this.address)
 
   this.location = {
@@ -132,10 +138,10 @@ BootcampSchema.pre('save', async function(next) {
 })
 
 //Cascade deleting
-BootcampSchema.pre('remove', async function(next) {
+BootcampSchema.pre('remove', async function (next) {
   console.log(`Courses removed referenced to ${this._id} bootcamp`)
 
-  await this.model('Course').deleteMany({bootcamp: this._id})
+  await this.model('Course').deleteMany({ bootcamp: this._id })
   next()
 })
 

@@ -37,6 +37,18 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/bootcamps
 //access PUBLIC
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
+  console.log(req.user)
+  //Add user to req.body
+  req.body.user = req.user.id
+
+  //Checking published bootcamp
+  let publishedBootcamp = await Bootcamp.findOne({ user: req.user.id })
+
+  if (publishedBootcamp && req.body.user !== 'admin') {
+    return next(
+      new ErrorResponse(`Except admin others can not publish more than 1 bootcamp`, 400))
+  }
+
   let bootcamp = await Bootcamp.create(req.body)
 
   res
@@ -61,7 +73,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.id)
 
-  if(!bootcamp) {
+  if (!bootcamp) {
     return next(
       new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`)
     )
@@ -105,7 +117,7 @@ exports.getBootcampInRadius = asyncHandler(async (req, res, next) => {
     })
 
 
-}) 
+})
 
 
 
@@ -115,11 +127,11 @@ exports.getBootcampInRadius = asyncHandler(async (req, res, next) => {
 exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
   let bootcamp = await Bootcamp.findById(req.params.id)
 
-  if(!bootcamp) {
-      return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404))
+  if (!bootcamp) {
+    return next(new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404))
   }
 
-  if(!req.files) {
+  if (!req.files) {
     return next(new ErrorResponse(`Please upload a file`, 400))
   }
 
@@ -128,12 +140,12 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
   const file = req.files.file
 
   //Check if file is image
-  if(!file.mimetype.startsWith('image')) {
+  if (!file.mimetype.startsWith('image')) {
     return next(new ErrorResponse(`Please upload an image file`, 400))
   }
 
   //Check file size
-  if(file.size > process.env.MAX_FILE_UPLOAD) {
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
     return next(new ErrorResponse(`Please upload a file less than ${process.env.MAX_FILE_UPLOAD}`, 400))
   }
 
@@ -143,15 +155,15 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
 
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
 
-    if(err) {
+    if (err) {
       return next(new ErrorResponse(`Problem with uploading a file`, 500))
     }
 
-    await Bootcamp.findByIdAndUpdate(req.params.id, {photo: file.name})
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name })
 
 
     res.status(200)
-       .json({success: true, data: file.name})
+      .json({ success: true, data: file.name })
   })
 
 

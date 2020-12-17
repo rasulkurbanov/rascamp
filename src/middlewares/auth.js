@@ -9,17 +9,17 @@ exports.protect = asyncHandler(async (req, res, next) => {
   console.log(req.headers.authorization.startsWith('Bearer'))
 
   //Get token from req.headers.authorization
-  if(req.headers.authorization &&
-     req.headers.authorization.startsWith('Bearer')
-     ){
-       token = req.headers.authorization.split(' ')[1]
-       console.log(token)
-     } 
+  if (req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1]
+    console.log(token)
+  }
 
-     console.log(token)
+  console.log(token)
 
   //Checking if token exists
-  if(!token) {
+  if (!token) {
     return next(new ErrorResponse(`Unauthorized to access this route`, 401))
   }
 
@@ -28,11 +28,21 @@ exports.protect = asyncHandler(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
     console.log(decoded)
 
-    req.user =  await User.findById(decoded.id)
+    req.user = await User.findById(decoded.id)
 
     next()
   }
-  catch(err) {
+  catch (err) {
     return next(new ErrorResponse(`Invalid token`, 401))
   }
 })
+
+//Check if user has permission to specific routes
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+      if (!roles.includes(req.user.role)) {
+        return next(new ErrorResponse(`${req.user.role} has no permission to access`, 403))
+      }
+      next()
+  }
+}

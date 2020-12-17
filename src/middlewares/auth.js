@@ -6,12 +6,17 @@ const User = require('../models/User')
 
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
+  console.log(req.headers.authorization.startsWith('Bearer'))
 
   //Get token from req.headers.authorization
   if(req.headers.authorization &&
-     req.headers.authorization.startsWith('Beaver')) {
+     req.headers.authorization.startsWith('Bearer')
+     ){
        token = req.headers.authorization.split(' ')[1]
+       console.log(token)
      } 
+
+     console.log(token)
 
   //Checking if token exists
   if(!token) {
@@ -20,7 +25,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   try {
     //Verifying token
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
     console.log(decoded)
 
     req.user =  await User.findById(decoded.id)

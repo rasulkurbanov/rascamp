@@ -106,6 +106,12 @@ exports.deleteCourse = asyncHandler( async (req, res, next) => {
     return new ErrorResponse(`No course with the id of ${req.params.bootcampId}`, 404)
   }
 
+  //Check if bootcamp owner matches
+  if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`This id ${req.user.id} is not an owner of bootcamp, thus can not delete`, 401))
+  }
+
   course.remove()
 
   res.status(200)

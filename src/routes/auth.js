@@ -1,7 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const { protect } = require('../middlewares/auth')
-const { register, login, getMe, forgotPassword, resetPassword, updateDetails } = require('../controllers/auth')
+const { register,
+        login,
+        getMe,
+        forgotPassword,
+        resetPassword,
+        updateDetails, 
+        updatePassword } = require('../controllers/auth')
 
 
 router.route('/register')
@@ -21,5 +27,7 @@ router.route('/resetpassword/:resettoken')
 
 router.route('/updatedetails')
       .put(protect, updateDetails)
+
+router.route('/updatepassword').put(protect, updatePassword)
 
 module.exports = router

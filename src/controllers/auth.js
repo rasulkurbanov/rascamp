@@ -3,6 +3,7 @@ const ErrorResponse = require('../utils/errorResponse')
 const User = require('../models/User')
 const sendEmail = require('../utils/sendEmail')
 const crypto = require('crypto')
+const { findOne } = require('../models/User')
 
 
 //@desc Register user
@@ -160,6 +161,27 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ success: true, data: user })
 })
+
+
+
+//@desc Update current logged in user password to new one
+//@route GET /api/v1/auth/updatepassword
+//access Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id).select('+password')
+
+  if(!(await user.checkPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse(`Password is incorrect`, 401))
+  }
+
+  user.password = req.body.newPassword
+  await user.save()
+
+  sendTokenResponse(user, 200, res)
+
+})
+
 
 
 

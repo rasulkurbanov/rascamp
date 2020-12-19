@@ -54,7 +54,7 @@ exports.addCourses = asyncHandler( async (req, res, next) => {
   //Check if bootcamp owner matches
   if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
     return next(
-      new ErrorResponse(`This id ${req.user.id} is not an owner of bootcamp, thus can not add course`, 400))
+      new ErrorResponse(`This id ${req.user.id} is not an owner of bootcamp, thus can not add course`, 401))
   }
 
 
@@ -76,6 +76,12 @@ exports.updateCourse = asyncHandler( async (req, res, next) => {
 
   if(!course) {
     return new ErrorResponse(`No course with the id of ${req.params.bootcampId}`, 404)
+  }
+
+  //Check if bootcamp owner matches
+  if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(`This id ${req.user.id} is not an owner of bootcamp, thus can not update`, 401))
   }
 
   course = await Course.findByIdAndUpdate(req.params.id, req.body, {

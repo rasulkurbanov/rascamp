@@ -3,7 +3,6 @@ const ErrorResponse = require('../utils/errorResponse')
 const User = require('../models/User')
 const sendEmail = require('../utils/sendEmail')
 const crypto = require('crypto')
-const { findOne } = require('../models/User')
 
 
 //@desc Register user

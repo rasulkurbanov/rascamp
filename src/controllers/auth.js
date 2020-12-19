@@ -1,6 +1,7 @@
 const asyncHandler = require('../middlewares/async')
 const ErrorResponse = require('../utils/errorResponse')
 const User = require('../models/User')
+const { use } = require('../routes/auth')
 
 
 //@desc Register user
@@ -47,6 +48,39 @@ exports.login = asyncHandler(async(req, res, next) => {
   }
 
   sendTokenResponse(user, 200, res)
+})
+
+//@desc Get current logged in user
+//@route GET /api/v1/auth/me
+//access Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id)
+
+  res
+    .status(200)
+    .json({success: true, data: user})
+})
+
+
+//@desc Get reset password token
+//@route POST /api/v1/auth/forgotpassword
+//access Public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({email: req.body.email})
+
+  if(!user) {
+    return next(new ErrorResponse(`There is no user connected to this email`, 400))
+  }
+
+  let resetToken = user.getResetPasswordToken()
+
+  console.log(resetToken)
+
+  await user.save({validateBeforeSave: false})
+
+  res
+    .status(200)
+    .json({success: true, data: user})
 })
 
 

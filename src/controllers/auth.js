@@ -2,13 +2,14 @@ const asyncHandler = require('../middlewares/async')
 const ErrorResponse = require('../utils/errorResponse')
 const User = require('../models/User')
 const sendEmail = require('../utils/sendEmail')
+const crypto = require('crypto')
 
 
 //@desc Register user
 //@route POST /api/v1/auth/register
 //access PUBLIC
-exports.register = asyncHandler(async(req, res, next) => {
-  const {name, email, role, password } = req.body
+exports.register = asyncHandler(async (req, res, next) => {
+  const { name, email, role, password } = req.body
 
   const user = await User.create({
     name,
@@ -26,24 +27,24 @@ exports.register = asyncHandler(async(req, res, next) => {
 //@desc Login user
 //@route POST /api/v1/auth/login
 //access PUBLIC
-exports.login = asyncHandler(async(req, res, next) => {
-  const {email, password } = req.body
+exports.login = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body
 
-  if(!email || !password) {
+  if (!email || !password) {
     return next(new ErrorResponse(`Please enter password or email`, 400))
   }
 
   //Checking if user exists
-  const user = await User.findOne({email: email}).select('+password')
+  const user = await User.findOne({ email: email }).select('+password')
 
-  if(!user) {
+  if (!user) {
     return next(new ErrorResponse(`Incorrect password or email`), 401)
   }
 
   //Checking password matches with password stored in DB
   const isMatch = await user.checkPassword(password)
 
-  if(!isMatch) {
+  if (!isMatch) {
     return next(new ErrorResponse(`Incorrect password or email`, 401))
   }
 
@@ -58,7 +59,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json({success: true, data: user})
+    .json({ success: true, data: user })
 })
 
 
@@ -66,18 +67,19 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 //@route POST /api/v1/auth/forgotpassword
 //access Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({email: req.body.email})
+  const user = await User.findOne({ email: req.body.email })
 
-  if(!user) {
+  if (!user) {
     return next(new ErrorResponse(`There is no user connected to this email`, 400))
   }
 
-  let resetToken = user.getResetPasswordToken()
+  let resetToken = await user.getResetPasswordToken()
 
-  await user.save({validateBeforeSave: false})
+  await user.save({ validateBeforeSave: false })
 
   //Create reset URL
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetpassword/${resetToken}`   
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`
+
 
   //Create message
   const message = `You are sent an email that someone has requested the reset of a password. Please verify by clicking${resetUrl} if you are`;
@@ -91,26 +93,55 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
     res
       .status(200)
-      .json({success: true, data: 'Email sent'})
+      .json({ success: true, data: 'Email sent' })
   }
-  catch(err) {
+  catch (err) {
     console.log(err)
     user.resetPasswordToken = undefined
     user.resetPasswordExpire = undefined
 
-    await user.save({validateBeforeSave: false})
+    await user.save({ validateBeforeSave: false })
 
     return next(new ErrorResponse(`Email could not be sent`, 500))
   }
 
-  res.status(200).json({success: true, data: user})
+  res.status(200).json({ success: true, data: user })
 
 })
 
 
+
+//@desc Reset password
+//@route PUT /api/v1/auth/resetpassword/:resettoken
+//access Public
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  //Get hashed token
+  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex')
+
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  })
+
+  if(!user) {
+    return next(new ErrorResponse(`Invalid token`, 400))
+  }
+
+  //Set new password
+  user.password = req.body.password
+  user.resetPasswordToken = undefined
+  user.resetPasswordExpire = undefined
+
+  await user.save()
+
+  sendTokenResponse(user, 200, res)
+
+})
+
 //Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
-  
+
 
   //Creating token
   const token = user.getSignedJwtToken()
@@ -123,7 +154,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie('token', token, options)
-    .json({success: true, token})
+    .json({ success: true, token })
 
 }
 

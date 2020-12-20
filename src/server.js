@@ -5,6 +5,7 @@ const helmet = require('helmet')
 const xss = require('xss-clean')
 const mongoSanitize = require('express-mongo-sanitize')
 const rateLimit = require('express-rate-limit')
+const hpp = require('hpp')
 const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
 const path = require('path')
@@ -48,6 +49,9 @@ const limiter = rateLimit({
 })
 //apply to all request
 app.use(limiter)
+
+//Set hpp middleware to prevent http pollution
+app.use(hpp())
 
 //Cookie parser
 app.use(cookieParser())

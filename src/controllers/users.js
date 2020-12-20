@@ -1,7 +1,6 @@
-const User = require('../models/Bootcamp')
+const User = require('../models/User')
 const asyncHandler = require('../middlewares/async')
 const ErrorResponse = require('../utils/errorResponse')
-const asyncHandler = require('../middlewares/async')
 const advancedResults = require('../middlewares/advancedResults')
 
 //@desc Get all users
@@ -15,7 +14,9 @@ exports.getUsers = asyncHandler(async(req, res, next) => {
 //@route GET /api/v1/users/:id
 //@access Private/Admin
 exports.getUser = asyncHandler(async(req, res, next) => {
-  const user = User.findById(req.params.id)
+  console.log(req.params.id)
+  const user = await User.findById(req.params.id)
+
 
   res.status(200).json({
     success: true,

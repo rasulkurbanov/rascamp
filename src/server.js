@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const helmet = require('helmet')
 const xss = require('xss-clean')
 const mongoSanitize = require('express-mongo-sanitize')
+const rateLimit = require('express-rate-limit')
 const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
 const path = require('path')
@@ -39,6 +40,14 @@ app.use(helmet())
 
 //Sanitizing user input threads
 app.use(xss())
+
+//Setting limiter
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 1
+})
+//apply to all request
+app.use(limiter)
 
 //Cookie parser
 app.use(cookieParser())

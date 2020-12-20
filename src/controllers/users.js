@@ -58,11 +58,11 @@ exports.updateUser = asyncHandler(async(req, res, next) => {
 //@access Private/Admin
 exports.deleteUser = asyncHandler(async(req, res, next) => {
 
-  await 
+  await User.findByIdAndDelete(req.params.id)
 
   res.status(200).json({
     success: true,
-    data: user
+    data: {}
   })
 })
   

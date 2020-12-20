@@ -1,6 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
+const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
 const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
@@ -32,6 +33,9 @@ if(process.env.NODE_ENV === 'development') {
 //MongoSanitize
 app.use(mongoSanitize())
 
+//Setting app security using helmet
+app.use(helmet())
+
 //Cookie parser
 app.use(cookieParser())
 
@@ -49,8 +53,6 @@ app.use('/api/v1/auth', auth)
 app.use('/api/v1/users', users)
 
 app.use(errorHandler)
-
-
 
 
 app.listen(PORT, () => console.log(`Server running on ${process.env.NODE_ENV} mode and on PORT: ${PORT}`))

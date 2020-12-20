@@ -6,6 +6,7 @@ const xss = require('xss-clean')
 const mongoSanitize = require('express-mongo-sanitize')
 const rateLimit = require('express-rate-limit')
 const hpp = require('hpp')
+const cors = require('cors')
 const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
 const path = require('path')
@@ -45,13 +46,16 @@ app.use(xss())
 //Setting limiter
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 1
+  max: 10000
 })
 //apply to all request
 app.use(limiter)
 
 //Set hpp middleware to prevent http pollution
 app.use(hpp())
+
+//Set CORS middleware
+app.use(cors())
 
 //Cookie parser
 app.use(cookieParser())

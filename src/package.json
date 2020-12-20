@@ -18,7 +18,8 @@
     "nodemailer": "^6.4.17",
     "nodemon": "^2.0.6",
     "path": "^0.12.7",
-    "slugify": "^1.4.6"
+    "slugify": "^1.4.6",
+    "xss-clean": "^0.1.1"
   },
   "devDependencies": {},
   "scripts": {

@@ -2,6 +2,7 @@ const express = require('express')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const helmet = require('helmet')
+const xss = require('xss-clean')
 const mongoSanitize = require('express-mongo-sanitize')
 const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
@@ -35,6 +36,9 @@ app.use(mongoSanitize())
 
 //Setting app security using helmet
 app.use(helmet())
+
+//Sanitizing user input threads
+app.use(xss())
 
 //Cookie parser
 app.use(cookieParser())

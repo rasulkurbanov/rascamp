@@ -1,12 +1,14 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
+const mongoSanitize = require('express-mongo-sanitize')
 const fileUpload = require('express-fileupload')
 const cookieParser = require('cookie-parser')
 const path = require('path')
 //Loading env variables
 dotenv.config({ path: './config/config.env' })
 const PORT = process.env.PORT || 5000
+
 
 //Importing routes
 const bootcamps = require('./routes/bootcamps')
@@ -26,6 +28,9 @@ app.use(express.json())
 if(process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
+
+//MongoSanitize
+app.use(mongoSanitize())
 
 //Cookie parser
 app.use(cookieParser())

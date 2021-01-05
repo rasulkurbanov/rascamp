@@ -7,7 +7,8 @@ const { userInfo } = require('os')
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, `Please add a name`]
+    required: [true, `Please add a name`],
+    maxlength: [50, `Name can not be more than 50`]
   },
   email: {
     type: String,

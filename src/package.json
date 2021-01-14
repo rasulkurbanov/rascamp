@@ -29,7 +29,7 @@
     "start": "NODE_ENV=production node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": [],
+  "keywords": ["Backend", "API", "Node.js"],
   "author": "Rasuljon Kurbanov",
   "license": "ISC"
 }
